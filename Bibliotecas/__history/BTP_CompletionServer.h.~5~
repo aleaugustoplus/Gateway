@@ -1,0 +1,24 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_CompletionServerH
+#define BTP_CompletionServerH
+
+
+#include "BTP_Thread.h"
+#include "BTP_SocketServer.h"
+
+class BTP_CompletionServer :public BTP_Thread
+{
+
+ BTP_SocketServer *Sock;
+ void __TROPICALL Executar();
+
+ public:
+  BTP_CompletionServer(char*);
+  ~BTP_CompletionServer();
+
+};
+
+
+//---------------------------------------------------------------------------
+#endif

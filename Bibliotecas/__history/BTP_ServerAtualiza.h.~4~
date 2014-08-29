@@ -1,0 +1,39 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_ServerAtualizaH
+#define BTP_ServerAtualizaH
+
+
+
+
+#include "BTP_Thread.h"
+#include "PLC_Controle.h"
+
+
+
+class BTP_ServerAtualiza:public BTP_Thread
+{
+ PLC_Controle *PLC;
+ unsigned int NumClientes;
+
+void __TROPICALL Executar();
+
+
+ 
+
+
+
+
+public:
+
+	 BTP_ServerAtualiza(char*,PLC_Controle*plc);
+	 ~BTP_ServerAtualiza();
+	 void AddCliente(BTP_Socket*Cliente);
+
+
+
+
+
+};
+//---------------------------------------------------------------------------
+#endif

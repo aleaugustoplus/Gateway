@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------
+
+
+
+//---------------------------------------------------------------------------
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include "BTP_CompletionServer.h"
+
+
+int main(int argc, char* argv[])
+{
+   BTP_CompletionServer Servidor("Servidor");
+  //Servidor Server("Servidor");
+
+	printf("\n");
+	system("pause");
+	return 0;
+}
+//---------------------------------------------------------------------------

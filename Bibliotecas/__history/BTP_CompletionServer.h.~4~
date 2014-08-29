@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_CompletionServerH
+#define BTP_CompletionServerH
+
+
+#include "BTP_Thread.h"
+
+class BTP_CompletionServer :public BTP_Thread
+{
+
+ void __TROPICALL Executar();
+
+ public:
+  BTP_CompletionServer(char*);
+  ~BTP_CompletionServer();
+
+};
+
+
+//---------------------------------------------------------------------------
+#endif

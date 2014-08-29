@@ -1,0 +1,47 @@
+//---------------------------------------------------------------------------
+
+
+
+#include "BTP_CompletionServer.h"
+#include <stdlib.h>
+#include <stdio.h>
+//---------------------------------------------------------------------------
+BTP_CompletionServer::BTP_CompletionServer(char*nome):BTP_Thread(nome)
+{
+ PLC = new PLC_Controle("Controlador");
+
+// BTP_Thread::Ativa=true;
+}
+//---------------------------------------------------------------------------
+BTP_CompletionServer::~BTP_CompletionServer()
+{
+ delete PLC;
+}
+//---------------------------------------------------------------------------
+void __TROPICALL BTP_CompletionServer::Executar()
+{
+ Sock=new BTP_SocketServer("Servidor");
+ CompletionPort = new BTP_CompletionPort("Completion Port");
+
+ for(int x=0;x<4;x++)
+  Threads[x] = new BTP_WorkerThread("Threads",CompletionPort,PLC);
+
+ CompletionPort->AssociarArquivo(Sock->SockP);
+
+ for(;;)
+ {
+  CompletionPort->AssociarArquivo(Sock->AguardarConexao());
+  printf("\nCliente conectado!\n");
+ }
+
+ 
+}
+//---------------------------------------------------------------------------
+void BTP_CompletionServer::Iniciar()
+{
+ BTP_Thread::Ativa=true;
+
+
+ 
+}
+//---------------------------------------------------------------------------

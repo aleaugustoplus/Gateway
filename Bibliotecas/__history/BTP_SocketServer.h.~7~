@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_SocketServerH
+#define BTP_SocketServerH
+//---------------------------------------------------------------------------
+
+#include "BTP_Objeto.h"
+#include <winsock.h>
+
+
+class BTP_SocketServer:public BTP_Objeto
+{
+ SOCKET  escuta;
+
+ void __TROPICALL Objeto();
+
+ public:
+ BTP_SocketServer(char*);
+ ~BTP_SocketServer();
+
+};
+#endif

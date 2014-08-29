@@ -1,0 +1,280 @@
+//---------------------------------------------------------------------------
+
+
+
+#include "Servidor.h"
+
+//#define WIN32_LEAN_AND_MEAN
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <tchar.h>
+#include <string.h>
+#include <winsock.h>
+#include <io.h>
+
+
+
+//
+// Structure definition
+//
+
+// Pick a port number that seems to be away from all others
+#define SERV_TCP_PORT	5554
+#define MAXLINE			512	// Tamanho máximo da linha a ser editada pelo cliente
+
+// The context key keeps track of how the I/O
+// is progressing for each individual file handle.
+
+
+//
+// Global variables
+//
+
+HANDLE ghCompletionPort;
+
+#include <stdlib.h>
+#include <stdio.h>
+
+
+void CreateWorkerThreads();
+DWORD WINAPI ThreadFunc(LPVOID pvoid);
+void IssueRead(struct ContextKey *pCntx);
+void CheckOsVersion();
+void FatalError(char *s);
+
+//---------------------------------------------------------------------------
+Servidor::Servidor(char*nome):BTP_Thread(nome)
+{
+
+ BTP_Thread::Ativa=true;
+}
+//---------------------------------------------------------------------------
+Servidor::~Servidor()
+{
+
+}
+//---------------------------------------------------------------------------
+void __TROPICALL Servidor::Executar()
+{
+	SOCKET  listener;
+	SOCKET  newsocket;
+	WSADATA WsaData;
+	struct	sockaddr_in serverAddress;
+	struct	sockaddr_in clientAddress;
+	int     clientAddressLength;
+	int     err;
+
+	CheckOsVersion();	// Completion ports só rodam no NT e Windows 2000
+
+
+
+	CreateWorkerThreads();  // Cria pool de threads de trabalho
+
+
+
+	fprintf(stderr, "Echo Server with I/O Completion Ports\n");
+	fprintf(stderr, "Running on TCP port %d\n", SERV_TCP_PORT);
+	fprintf(stderr, "\nPress Ctrl+C to stop the server\n");
+
+	//
+	// Loop forever accepting requests new connections
+	// and starting reading from them.
+	//
+	for (;;)
+	{
+		struct ContextKey *pKey;
+
+		clientAddressLength = sizeof(clientAddress);
+		newsocket = accept(listener,
+							(struct sockaddr *)&clientAddress,
+							&clientAddressLength);
+		if (newsocket < 0) {
+			FatalError("accept() Failed");
+			return ;
+		}
+
+		// Create a context key and initialize it.
+		// calloc will zero the buffer
+
+
+
+
+		// Kick off the first read
+		IssueRead(pKey);
+	}
+}
+//---------------------------------------------------------------------------
+void CreateWorkerThreads()
+{
+    SYSTEM_INFO  sysinfo;
+    DWORD        dwThreadId;
+    DWORD        dwThreads;
+    DWORD        i;
+
+    GetSystemInfo(&sysinfo);
+	// Calcula número de threads a serem criadas
+    dwThreads = sysinfo.dwNumberOfProcessors * 2 + 2;
+    for (i=0; i<dwThreads; i++)
+    {
+        HANDLE hThread;
+        hThread = CreateThread(  // _beginthreadex é melhor
+            NULL, 0, ThreadFunc, NULL, 0, &dwThreadId
+            );
+        CloseHandle(hThread);
+    }
+}  // CreateWorkerThreads
+
+//
+// Each worker thread starts here.
+DWORD WINAPI ThreadFunc(LPVOID pVoid)
+{
+    BOOL    bResult;
+    DWORD   dwNumRead;
+    struct ContextKey *pCntx;
+    LPOVERLAPPED lpOverlapped;
+
+	//UNREFERENCED_PARAMETER(pVoid);
+
+    // Loop forever on getting packets from
+    // the I/O completion port.
+    for (;;)
+    {	// Se associa à Completion Port
+		bResult = GetQueuedCompletionStatus(
+               ghCompletionPort,
+               &dwNumRead,
+               &(DWORD)pCntx,
+               &lpOverlapped,
+               INFINITE
+            );
+
+        if (bResult == FALSE && lpOverlapped == NULL) {
+            FatalError(
+                "ThreadFunc - Illegal call to GetQueuedCompletionStatus");
+        }
+        else if (bResult == FALSE && lpOverlapped != NULL) {
+            // This happens occasionally instead of
+            // end-of-file. Not sure why.
+            closesocket(pCntx->sock);
+            free(pCntx);
+            fprintf(stderr,"ThreadFunc - I/O operation failed\n");
+        }
+        else if (dwNumRead == 0)
+        {
+            closesocket(pCntx->sock);
+            free(pCntx);
+            fprintf(stderr, "ThreadFunc - End of file.\n");
+        }
+
+        // Got a valid data block!
+        // Save the data to our buffer and write it
+        // all back out (echo it) if we have see a \n
+        else
+        {
+            // Aponta para posição corrente do buffer de saída
+            char *pch = &pCntx->OutBuffer[pCntx->nOutBufIndex++];
+			// Copia caracter do buffer de entrada para o de saída
+            *pch++ = pCntx->InBuffer[0];
+            *pch = '\0'; // Fecha o string para debugging, WriteFile doesn't care
+			// Detectou <CR>: envia linha formada em OutBuffer
+            if (pCntx->InBuffer[0] == '\n')
+            {
+                WriteFile(
+                        (HANDLE)(pCntx->sock),
+                        pCntx->OutBuffer,
+                        pCntx->nOutBufIndex,
+                        &pCntx->dwWritten,
+                        &pCntx->ovOut
+                    );
+                pCntx->nOutBufIndex = 0;
+                fprintf(stderr, "Echo on socket %x.\n", pCntx->sock);
+            }  // if 
+            // Solicita leitura do próximo caracter
+            IssueRead(pCntx);
+        }  //else 
+    }  // for
+	return 0;
+}  // ThreadFunc
+
+/*
+ * Call ReadFile to start an overlapped request
+ * on a socket.  Make sure we handle errors
+ * that are recoverable.
+ */
+void IssueRead(struct ContextKey *pCntx)
+{
+    int     i = 0;
+    BOOL    bResult;
+    int     err;
+    int     numRead;
+
+    while (++i)
+    {
+        // Solicita leitura com overlap de um caracter
+        bResult = ReadFile(
+                    (HANDLE)pCntx->sock,  // socket
+                    pCntx->InBuffer,
+					(DWORD)1,
+					(LPDWORD)&numRead,
+					&pCntx->ovIn // Ponteiro para estrutura overlap	+ apêndices
+				);
+
+        // A leitura foi completada imediatamente, mas não a processe aqui
+        // Espere pelo completion packet.
+		if (bResult)
+            return;
+
+        err = GetLastError();
+
+        // A leitura ficou pendente como queríamos: não é um erro
+        if (err == ERROR_IO_PENDING)
+            return;
+
+        // Handle recoverable error
+        if ( err == ERROR_INVALID_USER_BUFFER ||
+             err == ERROR_NOT_ENOUGH_QUOTA ||
+             err == ERROR_NOT_ENOUGH_MEMORY )
+        {	// Não seria i <= 5 ????: 5: tentativas
+            if (i == 5) {	// I just picked a number
+                Sleep(50);  // Wait around and try later
+                continue;
+            }
+            FatalError("IssueRead - System ran out of non-paged space");
+        }
+		// Outro erro não detectado
+        break;
+    }	// while
+
+    fprintf(stderr, "IssueRead - ReadFile failed.\n");
+}	// IssueRead
+
+//
+// Make sure we are running under the right versions
+// of Windows NT (3.51, 4.0, or later)
+// Outras versões não dispõem de Completion Key
+//
+void CheckOsVersion()
+{
+    OSVERSIONINFO   ver;
+    BOOL            bResult;
+
+    ver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    bResult = GetVersionEx((LPOSVERSIONINFO) &ver);
+
+    if ( (!bResult) ||
+         (ver.dwPlatformId != VER_PLATFORM_WIN32_NT) )
+    {
+        FatalError("ECHOSRV requires Windows NT 3.51 or later.");
+    }
+
+}
+
+//
+// Error handler
+//
+void FatalError(char *s)
+{
+    fprintf(stdout, "%s\n", s);
+    exit(EXIT_FAILURE);
+}  // FatalError

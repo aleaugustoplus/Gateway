@@ -1,0 +1,113 @@
+//---------------------------------------------------------------------------
+
+
+
+#include "BTP_Socket.h"
+//---------------------------------------------------------------------------
+BTP_Socket::BTP_Socket(char*nome,SOCKET temp):BTP_Objeto(nome)
+{
+	Sock=temp;
+	evSaida = new  BTP_Evento("Evento de Saida");
+	// Cria evento com Reset Manual
+	ovOut.hEvent = evSaida->hEvento;
+	ovOut.hEvent = (HANDLE)((DWORD)ovOut.hEvent | 0x1);
+
+	for(int x=0;x<NUM_SAIDAS_D;x++)
+	 AssinaVar.Saidas[x]=false;
+
+	for(int x=0;x<NUM_ENTRADAS_D;x++)
+	 AssinaVar.Entradas[x]=false;
+
+	for(int x=0;x<NUM_SAIDAS_A;x++)
+	 AssinaVar.SaidasA[x]=false;
+
+	for(int x=0;x<NUM_ENTRADAS_A;x++)
+	 AssinaVar.EntradasA[x]=false;
+
+	AssinaVar.TempoA = 1000;
+
+	proximo=NULL;
+	anterior=NULL;
+
+
+
+	LimparBuffer();
+}
+//---------------------------------------------------------------------------
+BTP_Socket::~BTP_Socket()
+{
+ delete evSaida;
+ closesocket(Sock);
+}
+//---------------------------------------------------------------------------
+void __TROPICALL BTP_Socket::Objeto()
+{
+
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::Ler()
+{
+	int     numRead;
+		// Solicita leitura com overlap de um caracter
+		 ReadFile(
+					(HANDLE)Sock,  // socket
+					InBuffer,
+					(DWORD)1,
+					(LPDWORD)&numRead,
+					 &ovIn // Ponteiro para estrutura overlap	+ apêndices
+				);
+
+
+
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::EscreverStr(char*Str)
+{
+ WriteFile(
+			  (HANDLE)(Sock),
+			  Str,
+			  strlen(Str),
+			  &dwWritten,
+			  &ovOut
+					);
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::LimparBuffer()
+{
+ for(int x=0;x<100;x++)
+  OutBuffer[x]='\0';
+
+ nOutBufIndex = 0;
+
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::AddToBuffer()
+{
+ if(nOutBufIndex>25)
+  return;
+ OutBuffer[nOutBufIndex]=InBuffer[0];
+ nOutBufIndex++;
+}
+//---------------------------------------------------------------------------
+BTP_Socket* BTP_Socket::PegarProximo()
+{
+ return proximo;
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::AlterarProximo(BTP_Socket* temp)
+{
+ proximo=temp;
+}
+//---------------------------------------------------------------------------
+BTP_Socket* BTP_Socket::PegarAnterior()
+{
+ return anterior;
+}
+//---------------------------------------------------------------------------
+void BTP_Socket::AlterarAnterior(BTP_Socket* temp)
+{
+ anterior=temp;
+}
+//---------------------------------------------------------------------------
+
+

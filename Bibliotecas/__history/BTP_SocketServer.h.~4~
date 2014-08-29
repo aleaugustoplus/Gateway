@@ -1,0 +1,34 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_SocketServerH
+#define BTP_SocketServerH
+//---------------------------------------------------------------------------
+
+#include "BTP_Objeto.h"
+#include <winsock.h>
+
+class BTP_SocketServer:public BTP_Objeto
+{
+ struct ContextKey
+ {
+	SOCKET  sock;
+	// Input
+	char        InBuffer[4];
+	OVERLAPPED  ovIn;
+	// Output
+	int         nOutBufIndex;
+	char        OutBuffer[MAXLINE];
+	OVERLAPPED  ovOut;
+	DWORD       dwWritten;
+ };
+
+ SOCKET  escuta;
+
+ void __TROPICALL Objeto();
+
+ public:
+ BTP_SocketServer(char*);
+ ~BTP_SocketServer();
+
+};
+#endif

@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------
+
+#ifndef ServidorH
+#define ServidorH
+
+
+#include "BTP_Thread.h"
+
+class Servidor :public Thread
+{
+
+ void __TROPICALL Executar();
+
+ public:
+ Servidor(char*);
+ ~Servidor();
+
+
+
+};
+//---------------------------------------------------------------------------
+#endif

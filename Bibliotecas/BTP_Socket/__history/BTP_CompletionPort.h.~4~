@@ -1,0 +1,22 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_CompletionPortH
+#define BTP_CompletionPortH
+
+
+#include <windows.h>
+#include <winsock2.h>
+#include "BTP_Objeto.h"
+//---------------------------------------------------------------------------
+class BTP_CompletionPort :public BTP_Objeto 
+{
+	HANDLE handleCompletionPort;
+
+	public:
+	__TROPICALL BTP_CompletionPort();
+	__TROPICALL ~BTP_CompletionPort();
+
+	HANDLE __TROPICALL PegarHandle();
+};
+//---------------------------------------------------------------------------
+#endif

@@ -1,0 +1,83 @@
+//---------------------------------------------------------------------------
+
+
+
+#include "BTP_CompletionServer.h"
+#include <stdlib.h>
+#include <stdio.h>
+//---------------------------------------------------------------------------
+BTP_CompletionServer::BTP_CompletionServer(char*nome):BTP_Thread(nome)
+{
+ PLC = new PLC_Controle("Controlador");
+
+// BTP_Thread::Ativa=true;
+}
+//---------------------------------------------------------------------------
+BTP_CompletionServer::~BTP_CompletionServer()
+{
+ delete PLC;
+}
+//---------------------------------------------------------------------------
+void __TROPICALL BTP_CompletionServer::Executar()
+{
+ Sock=new BTP_SocketServer("Servidor");
+ CompletionPort = new BTP_CompletionPort("Completion Port");
+
+ for(int x=0;x<4;x++)
+  Threads[x] = new BTP_WorkerThread("Threads",CompletionPort,PLC);
+
+ CompletionPort->AssociarArquivo(Sock->SockP);
+
+ for(;;)
+ {
+  CompletionPort->AssociarArquivo(Sock->AguardarConexao());
+  printf("\nCliente conectado!\n");
+ }
+
+ 
+}
+//---------------------------------------------------------------------------
+void BTP_CompletionServer::Iniciar()
+{
+ BTP_Thread::Ativa=true;
+ PLC->ThreadMsg = GetCurrentThreadId();
+
+ MSG Msg;
+
+ for(;;)
+ {
+  GetMessageA(&Msg,NULL,NULL,NULL);
+
+  switch(Msg.message)
+  {
+   case PLC_Controle::PLC_MUDOU_ENT:
+
+   break;
+   case PLC_Controle::PLC_MUDOU_SAIDA:
+   break;
+   case PLC_Controle::PLC_CONECTADO:
+	printf("PLC - Conectou\n");
+   break;
+   case PLC_Controle::PLC_DESCONECTADO:
+	printf("PLC - Desconectou\n");
+   break;
+   case PLC_Controle::PLC_MUDOU_MSG:
+//    printf("Ultima Msg:\n %s",PLC->Msg);
+
+   break;
+   case PLC_Controle::PLC_BTP_EXCECAO:
+//    printf("\n >Excecao %s<",)
+   break;
+   case PLC_Controle::PLC_EXCECAO:
+   break;
+
+
+  }
+
+
+ }
+
+
+ 
+}
+//---------------------------------------------------------------------------

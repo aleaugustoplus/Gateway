@@ -1,0 +1,130 @@
+//---------------------------------------------------------------------------
+
+
+
+#include "Servidor.h"
+
+
+#include <stdlib.h>
+#include <stdio.h>
+
+//---------------------------------------------------------------------------
+Servidor::Servidor(char*nome):BTP_Thread(nome)
+{
+
+ BTP_Thread::Ativa=true;
+}
+//---------------------------------------------------------------------------
+Servidor::~Servidor()
+{
+
+}
+//---------------------------------------------------------------------------
+void __TROPICALL Servidor::Executar()
+{
+   SOCKET  listener;
+	SOCKET  newsocket;
+	WSADATA WsaData;
+	struct	sockaddr_in serverAddress;
+	struct	sockaddr_in clientAddress;
+	int     clientAddressLength;
+	int     err;
+
+	CheckOsVersion();	// Completion ports só rodam no NT e Windows 2000
+
+	err = WSAStartup (0x0101, &WsaData);
+	if (err == SOCKET_ERROR)
+	{
+		FatalError("WSAStartup Failed");
+		return EXIT_FAILURE;
+	}
+
+	/*
+	 * Open a TCP socket connection to the server
+	 * By default, a socket is always opened
+	 * for overlapped I/O.  Do NOT attach this
+	 * socket (listener) to the I/O completion
+     * port!
+     */
+    listener = socket(AF_INET, SOCK_STREAM, 0);
+	if (listener < 0)
+    {
+        FatalError("socket() failed");
+        return EXIT_FAILURE;
+    }
+
+    /*
+     * Bind our local address
+     */
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family      = AF_INET;
+    serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddress.sin_port        = htons(SERV_TCP_PORT);
+
+    err = bind(listener,
+            (struct sockaddr *)&serverAddress,
+            sizeof(serverAddress)
+          );
+    if (err < 0)
+        FatalError("bind() failed");
+
+    ghCompletionPort = CreateIoCompletionPort(
+            INVALID_HANDLE_VALUE,
+            NULL,   // No prior port
+            0,      // No key
+            0       // Use default  # of threads
+            );
+    if (ghCompletionPort == NULL)
+        FatalError("CreateIoCompletionPort() failed");
+
+	CreateWorkerThreads();  // Cria pool de threads de trabalho
+
+	// coverte socket em socket de escuta
+    listen(listener, 5);	// Máximo de 5 conexões simultaneas
+
+    fprintf(stderr, "Echo Server with I/O Completion Ports\n");
+    fprintf(stderr, "Running on TCP port %d\n", SERV_TCP_PORT);
+    fprintf(stderr, "\nPress Ctrl+C to stop the server\n");
+
+    //
+    // Loop forever accepting requests new connections
+    // and starting reading from them.
+    //
+    for (;;)
+    {
+        struct ContextKey *pKey;
+
+        clientAddressLength = sizeof(clientAddress);
+        newsocket = accept(listener,
+                            (struct sockaddr *)&clientAddress,
+                            &clientAddressLength);
+		if (newsocket < 0) {
+            FatalError("accept() Failed");
+            return EXIT_FAILURE;
+        }
+
+        // Create a context key and initialize it.
+        // calloc will zero the buffer
+		pKey = (ContextKey *)calloc(1, sizeof(struct ContextKey));
+        pKey->sock = newsocket;
+        // Cria evento com Reset Manual
+		pKey->ovOut.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL); 
+        // Seta flag no evento para que um packat não seja colocado
+		// na fila da completion port quando uma operação de escrita 
+		// for completada
+        pKey->ovOut.hEvent = (HANDLE)((DWORD)pKey->ovOut.hEvent | 0x1);
+
+        // Associa o socket da transação à completion port
+		// Vários arquivos (sockets) podem estar associados à mesma completion port
+        CreateIoCompletionPort(
+                (HANDLE)newsocket,
+                ghCompletionPort,
+                (DWORD)pKey,   // No key
+                0              // Use default # of threads
+            );
+
+        // Kick off the first read
+        IssueRead(pKey);
+    }
+}
+//---------------------------------------------------------------------------

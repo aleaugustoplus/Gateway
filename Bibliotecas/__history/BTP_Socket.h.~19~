@@ -1,0 +1,75 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_SocketH
+#define BTP_SocketH
+//---------------------------------------------------------------------------
+
+
+#include "BTP_Objeto.h"
+#include "BTP_Evento.h"
+
+#include <winsock.h>
+#define MAXLINE			512	// Tamanho máximo da linha a ser editada pelo cliente
+
+#define NUM_SAIDAS_D   5
+#define NUM_ENTRADAS_D 4
+#define NUM_ENTRADAS_A 4
+#define NUM_SAIDAS_A   4
+
+class BTP_Socket: public BTP_Objeto
+{
+ BTP_Evento * evSaida;
+
+ typedef struct __AssinaVar {
+	 bool Saidas[NUM_SAIDAS_D];
+	 bool Entradas[NUM_ENTRADAS_D];
+	 bool SaidasA[NUM_SAIDAS_A];
+	 bool EntradasA[NUM_ENTRADAS_A];
+	 unsigned int TempoA;
+
+}_AssinaVar;
+
+ _AssinaVar AssinaVar;
+
+ BTP_Socket *proximo;
+ BTP_Socket *anterior;
+
+
+ public:
+
+ SOCKET Sock;
+	// Input
+ char        InBuffer[5];
+ OVERLAPPED  ovIn;
+ // Output
+ int         nOutBufIndex;
+ char        OutBuffer[MAXLINE];
+ OVERLAPPED  ovOut;
+ DWORD       dwWritten;
+
+
+ void __TROPICALL Objeto();
+ void Ler();
+
+
+ public:
+  BTP_Socket(char*,SOCKET);
+  ~BTP_Socket();
+
+  void LimparBuffer();
+  void AddToBuffer();
+  void EscreverStr(char*Str);
+
+
+  __property BTP_Socket* Proximo = {read = PegarProximo, write = AlterarProximo};
+  __property BTP_Socket* Anterior = {read = PegarAnterior, write = AlterarAnterior};
+
+
+  BTP_Socket* PegarProximo();
+  void AlterarProximo(BTP_Socket*);
+  BTP_Socket* PegarAnterior();
+  void AlterarAnterior(BTP_Socket*);
+
+
+};
+#endif

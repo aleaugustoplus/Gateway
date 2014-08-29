@@ -1,0 +1,40 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_WorkerThreadH
+#define BTP_WorkerThreadH
+
+
+ #include "BTP_Thread.h"
+ #include "BTP_CompletionPort.h"
+ #include "PLC_Controle.h"
+
+class BTP_WorkerThread:public BTP_Thread
+{
+ enum SOCK_CTRL_MSG{
+                     CLIENTE_DESCONECTOU = 20000,
+
+ };
+
+ BTP_CompletionPort *CompletionPort;
+ PLC_Controle *PLC;
+ void __TROPICALL Executar();
+ void AlterarSaidasDigitais(BTP_Socket *);
+ void StatusMsg(BTP_Socket *);
+ void DesligarMsg(BTP_Socket *);
+ void EntregarMsg(unsigned int Msg);
+ DWORD threadmsg;
+
+
+ public:
+ BTP_WorkerThread(char*,BTP_CompletionPort*,PLC_Controle*);
+ ~BTP_WorkerThread();
+
+ __property DWORD ThreadMsg = {write = AlterarThreadMsg};
+
+ void AlterarThreadMsg(DWORD); 
+
+
+};
+//---------------------------------------------------------------------------
+#endif
+

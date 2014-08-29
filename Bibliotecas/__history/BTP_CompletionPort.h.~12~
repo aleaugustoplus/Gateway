@@ -1,0 +1,39 @@
+//---------------------------------------------------------------------------
+
+#ifndef BTP_CompletionPortH
+#define BTP_CompletionPortH
+
+
+#include <windows.h>
+#include <winsock2.h>
+#include "BTP_Objeto.h"
+
+#include "BTP_PortaSerial.h"
+#include "BTP_PortaSocket.h"
+
+
+
+//---------------------------------------------------------------------------
+class BTP_CompletionPort :public BTP_Objeto
+{
+	HANDLE handleCompletionPort;
+
+	void __TROPICALL Objeto();
+
+	public:
+	__TROPICALL BTP_CompletionPort(char*nome);
+	__TROPICALL ~BTP_CompletionPort();
+	void AssociarArquivo(BTP_PortaSerial*);
+	void AssociarArquivo(BTP_Socket*);
+
+	bool AssociarThread(LPDWORD lpNumberOfBytesTransferred,
+						PULONG_PTR lpCompletionKey,
+						LPOVERLAPPED *lpOverlapped,
+						unsigned int TimeOut = INFINITE);
+
+	__property HANDLE hHandle = {read = PegarHandle };
+
+	HANDLE __TROPICALL PegarHandle();
+};
+//---------------------------------------------------------------------------
+#endif

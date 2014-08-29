@@ -1,0 +1,31 @@
+//---------------------------------------------------------------------------
+
+#include "BTP_CompletionPort.h"
+#include "BTP_Excecao.h"
+
+//---------------------------------------------------------------------------
+
+__TROPICALL BTP_CompletionPort::BTP_CompletionPort()
+{
+	// Cria Completion Port
+	handleCompletionPort = CreateIoCompletionPort(
+			INVALID_HANDLE_VALUE,
+			NULL,	// Completion port existente
+			0,		// Chave
+			0);		// Número de threads = Número de processadores
+	if(handleCompletionPort == NULL)
+	{
+		throw new BTP_Excecao("Falha ao criar I/O CompletionPort!");
+    }
+}
+//---------------------------------------------------------------------------
+__TROPICALL BTP_CompletionPort::~BTP_CompletionPort()
+{
+
+}
+//---------------------------------------------------------------------------
+HANDLE __TROPICALL BTP_CompletionPort::PegarHandle()
+{
+	return handleCompletionPort;
+}
+//---------------------------------------------------------------------------

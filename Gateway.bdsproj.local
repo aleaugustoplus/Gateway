@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2008/07/24 16:24:25.968.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Meus documentos\Borland Studio Projects\Unit1.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit1.cpp</Transaction>
+    <Transaction>2008/07/24 16:24:35.750.bdsproj,C:\Documents and Settings\Mateus.MATEUS-CELERON\Meus documentos\Borland Studio Projects\Project1.bdsproj=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Gateway.bdsproj</Transaction>
+    <Transaction>2008/07/24 16:28:48.453.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Servidor.cpp</Transaction>
+    <Transaction>2008/07/24 16:28:48.453.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Servidor.h</Transaction>
+    <Transaction>2008/07/24 16:43:50.000.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_CompletionServer.cpp</Transaction>
+    <Transaction>2008/07/24 16:43:50.000.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_CompletionServer.h</Transaction>
+    <Transaction>2008/07/24 16:47:15.718.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_SocketServer.cpp</Transaction>
+    <Transaction>2008/07/24 16:47:15.718.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_SocketServer.h</Transaction>
+    <Transaction>2008/07/24 17:13:13.750.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkThread.cpp</Transaction>
+    <Transaction>2008/07/24 17:13:13.750.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkThread.h</Transaction>
+    <Transaction>2008/07/24 17:13:37.109.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkThread.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkerThread.cpp</Transaction>
+    <Transaction>2008/07/24 17:13:37.109.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkThread.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_WorkerThread.h</Transaction>
+    <Transaction>2008/07/24 17:24:47.375.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_Socket.cpp</Transaction>
+    <Transaction>2008/07/24 17:24:47.375.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_Socket.h</Transaction>
+    <Transaction>2008/07/24 17:52:58.531.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Servidor.cpp=</Transaction>
+    <Transaction>2008/07/24 19:14:20.312.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Servidor.cpp=</Transaction>
+    <Transaction>2008/07/26 14:43:57.390.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Servidor.cpp=</Transaction>
+    <Transaction>2008/07/30 12:46:00.531.cpp,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.cpp=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_ServerAtualiza.cpp</Transaction>
+    <Transaction>2008/07/30 12:46:00.546.h,C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Unit2.h=C:\Documents and Settings\Mateus.MATEUS-CELERON\Desktop\Tempo Real\Gateway\Bibliotecas\BTP_ServerAtualiza.h</Transaction>
+  </Transactions>
+</BorlandProject>
